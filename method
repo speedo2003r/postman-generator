@@ -1,0 +1,149 @@
+src/Services/CollectionBuilder.php:17:        $collectionName = config('postman-generator.collection_name', 'Laravel API');
+src/Services/CollectionBuilder.php:18:        $baseUrl = config('postman-generator.base_url', '{{base_url}}');
+src/Services/CollectionBuilder.php:20:        $items = $this->groupIntoFolders($routes, $bodies);
+src/Services/CollectionBuilder.php:27:        if (config('postman-generator.include_tenant_id')) {
+src/Services/CollectionBuilder.php:47:            $folderName = $route->folder;
+src/Services/CollectionBuilder.php:48:            $requestName = $this->getUniqueName($route->name, $names);
+src/Services/CollectionBuilder.php:50:            $item = $this->buildRequestItem($route, $requestName, $bodies[$route->route->uri] ?? null);
+src/Services/CollectionBuilder.php:83:        $uriWithVars = preg_replace('/(?<!\{)\{(\w+)\}(?!\})/', ':$1', $route->route->uri);
+src/Services/CollectionBuilder.php:89:        foreach ($route->route->parameterNames as $param) {
+src/Services/CollectionBuilder.php:96:                ['key' => 'Content-Type', 'value' => 'application/json', 'type' => 'text'],
+src/Services/CollectionBuilder.php:104:            'method' => $route->route->method,
+src/Services/CollectionBuilder.php:107:        if ($route->authType === 'bearer') {
+src/Services/CollectionBuilder.php:116:        if ($body && !$body->isEmpty) {
+src/Services/CollectionBuilder.php:117:            $request['body'] = $this->buildBody($body);
+src/Services/CollectionBuilder.php:122:            'description' => $route->description,
+src/Services/CollectionBuilder.php:124:            '_generator_id' => $route->id, // Internal use for response attachment matching
+src/Services/CollectionBuilder.php:130:        if ($body->mode === 'raw') {
+src/Services/CollectionBuilder.php:133:                'raw' => json_encode($body->json, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR),
+src/Services/CollectionBuilder.php:140:        if ($body->mode === 'formdata') {
+src/Services/CollectionBuilder.php:142:            foreach ($body->formFields as $field) {
+src/Services/CollectionBuilder.php:144:                    'key' => $field->key,
+src/Services/CollectionBuilder.php:145:                    'value' => $field->value,
+src/Services/CollectionBuilder.php:146:                    'type' => $field->type,
+src/Services/BodyExampleGenerator.php:23:        if (!config('postman-generator.auto_examples', true)) {
+src/Services/BodyExampleGenerator.php:27:        if (in_array($route->route->method, ['GET', 'DELETE', 'HEAD', 'OPTIONS'])) {
+src/Services/BodyExampleGenerator.php:31:        if (!$route->formRequestClass) {
+src/Services/BodyExampleGenerator.php:36:            $rules = $this->getRules($route->formRequestClass, $route->method);
+src/Services/BodyExampleGenerator.php:37:            return $this->parseRules($rules);
+src/Services/BodyExampleGenerator.php:39:            // FR-6.5/NFR-7: Log warning to console and continue
+src/Services/BodyExampleGenerator.php:40:            // In a real Laravel command, this would be $this->warn(). 
+src/Services/BodyExampleGenerator.php:49:        $instance = $this->app->build($formRequestClass);
+src/Services/BodyExampleGenerator.php:52:        $instance->setMethod($method);
+src/Services/BodyExampleGenerator.php:53:        $instance->replace([]);
+src/Services/BodyExampleGenerator.php:55:        return $instance->rules();
+src/Services/BodyExampleGenerator.php:66:            if ($this->isFileType($rulesArray)) {
+src/Services/BodyExampleGenerator.php:70:            $value = $this->exampleValueFromRules($rulesArray);
+src/Services/BodyExampleGenerator.php:73:            $this->normalizeAndSet($data, $field, $value);
+src/Services/BodyExampleGenerator.php:79:                // Map numeric indexes back to wildcards for rule lookup (e.g. items.0.photo -> items.*.photo)
+src/Services/BodyExampleGenerator.php:81:                $type = $this->deriveBinaryType($rules[$ruleKey] ?? $rules[$key] ?? []);
+src/Services/BodyExampleGenerator.php:96:            $normalizedKey = substr($normalizedKey, 0, -2) . '.0';
+src/Services/BodyExampleGenerator.php:119:            return '2024-01-01';
+src/Services/BodyExampleGenerator.php:123:            return '00000000-0000-0000-0000-000000000000';
+src/Services/BodyExampleGenerator.php:169:        return $this->isFileType($rules) ? 'file' : 'text';
+src/Services/ResponseExampleGenerator.php:14:        if (!config('postman-generator.generate_responses', false)) {
+src/Services/ResponseExampleGenerator.php:18:        // FR-6: Response generation is local/testing only for safety
+src/Services/ResponseExampleGenerator.php:19:        if (!app()->environment('local', 'testing') && !app()->runningUnitTests()) {
+src/Services/ResponseExampleGenerator.php:23:        $token = config('postman-generator.token');
+src/Services/ResponseExampleGenerator.php:24:        $isAuthProtected = $route->authType === 'bearer';
+src/Services/ResponseExampleGenerator.php:31:            $response = $this->makeRequest($route, $body, $token);
+src/Services/ResponseExampleGenerator.php:50:        $baseUrl = config('postman-generator.base_url', 'http://localhost');
+src/Services/ResponseExampleGenerator.php:51:        $url = rtrim($baseUrl, '/') . '/' . ltrim($route->route->uri, '/');
+src/Services/ResponseExampleGenerator.php:54:        $timeout = (int) config('postman-generator.response_timeout', 5);
+src/Services/ResponseExampleGenerator.php:55:        $maxBytes = (int) config('postman-generator.response_max_bytes', 10240);
+src/Services/ResponseExampleGenerator.php:60:                $client = $client->withToken($token);
+src/Services/ResponseExampleGenerator.php:63:            $method = strtolower($route->route->method);
+src/Services/ResponseExampleGenerator.php:66:                'get' => $client->get($url),
+src/Services/ResponseExampleGenerator.php:67:                'post' => $client->post($url, $body->json ?? []),
+src/Services/ResponseExampleGenerator.php:68:                'put' => $client->put($url, $body->json ?? []),
+src/Services/ResponseExampleGenerator.php:69:                'patch' => $client->patch($url, $body->json ?? []),
+src/Services/ResponseExampleGenerator.php:70:                'delete' => $client->delete($url, $body->json ?? []),
+src/Services/ResponseExampleGenerator.php:78:            $bodyContent = (string) $res->body();
+src/Services/ResponseExampleGenerator.php:84:                'status_code' => $res->status(),
+src/Services/ResponseExampleGenerator.php:85:                'status_text' => $this->getStatusText($res->status()),
+src/Services/ResponseExampleGenerator.php:86:                'headers' => $this->formatHeaders($res->headers()),
+src/Services/MetadataExtractor.php:21:        $metadata = $this->getRawMetadata($route);
+src/Services/MetadataExtractor.php:28:            authType: $this->authDetector->detect($route->middlewares),
+src/Services/MetadataExtractor.php:29:            formRequestClass: $route->controllerClass && $route->actionMethod
+src/Services/MetadataExtractor.php:30:                ? $this->formRequestResolver->resolve($route->controllerClass, $route->actionMethod)
+src/Services/MetadataExtractor.php:38:            'name' => $this->deriveName($route),
+src/Services/MetadataExtractor.php:40:            'folder' => $this->deriveFolder($route),
+src/Services/MetadataExtractor.php:43:        if (!$route->controllerClass || !$route->actionMethod) {
+src/Services/MetadataExtractor.php:47:        $reflection = new ReflectionMethod($route->controllerClass, $route->actionMethod);
+src/Services/MetadataExtractor.php:50:        $attributes = $reflection->getAttributes(PostmanMeta::class);
+src/Services/MetadataExtractor.php:53:            $instance = $attributes[0]->newInstance();
+src/Services/MetadataExtractor.php:55:                'name' => $instance->name ?: $defaults['name'],
+src/Services/MetadataExtractor.php:56:                'description' => $instance->description ?: $defaults['description'],
+src/Services/MetadataExtractor.php:57:                'folder' => $instance->folder ?: $defaults['folder'],
+src/Services/MetadataExtractor.php:62:        $docComment = $reflection->getDocComment();
+src/Services/MetadataExtractor.php:64:            $parsed = $this->parseDocBlock($docComment);
+src/Services/MetadataExtractor.php:77:        if ($route->routeName) {
+src/Services/MetadataExtractor.php:78:            return (string) str($route->routeName)->replace('.', ' ')->title();
+src/Services/MetadataExtractor.php:81:        $uriParts = explode('/', $route->uri);
+src/Services/MetadataExtractor.php:84:        return $route->method . ' ' . (string) str($lastPart)->title();
+src/Services/MetadataExtractor.php:90:        $parts = explode('/', trim($route->uri, '/'));
+src/Services/MetadataExtractor.php:91:        $targetGroup = config('postman-generator.route_groups', 'api');
+src/Services/MetadataExtractor.php:96:                return (string) str($part)->plural()->title();
+src/Services/MetadataExtractor.php:103:        if ($route->controllerClass) {
+src/Services/MetadataExtractor.php:104:            $className = class_basename($route->controllerClass);
+src/Services/MetadataExtractor.php:105:            return (string) str($className)->replace('Controller', '')->plural()->title();
+src/Services/MetadataExtractor.php:116:            'name' => '/@postman-name\s+(.+)/',
+src/Services/MetadataExtractor.php:117:            'description' => '/@postman-description\s+(.+)/',
+src/Services/MetadataExtractor.php:118:            'folder' => '/@postman-folder\s+(.+)/',
+src/Services/RouteScanner.php:17:        $targetGroup = config('postman-generator.route_groups', 'api');
+src/Services/RouteScanner.php:18:        $excludeRoutes = config('postman-generator.exclude_routes', []);
+src/Services/RouteScanner.php:19:        $excludeMiddlewares = config('postman-generator.exclude_middlewares', []);
+src/Services/RouteScanner.php:22:            if (!$this->shouldInclude($route, $targetGroup, $excludeRoutes, $excludeMiddlewares)) {
+src/Services/RouteScanner.php:27:                method: strtoupper($route->methods()[0]),
+src/Services/RouteScanner.php:28:                uri: $route->uri(),
+src/Services/RouteScanner.php:29:                controllerClass: $this->getControllerClass($route),
+src/Services/RouteScanner.php:30:                actionMethod: $this->getActionMethod($route),
+src/Services/RouteScanner.php:31:                middlewares: $route->gatherMiddleware(),
+src/Services/RouteScanner.php:32:                routeName: $route->getName(),
+src/Services/RouteScanner.php:33:                parameterNames: $route->parameterNames(),
+src/Services/RouteScanner.php:42:        $methods = $route->methods();
+src/Services/RouteScanner.php:49:        $middlewares = $route->gatherMiddleware();
+src/Services/RouteScanner.php:65:        $uri = $route->uri();
+src/Services/RouteScanner.php:77:        $action = $route->getAction();
+src/Services/RouteScanner.php:86:        $action = $route->getAction();
+src/Services/FormRequestResolver.php:19:        foreach ($reflection->getParameters() as $parameter) {
+src/Services/FormRequestResolver.php:20:            $type = $parameter->getType();
+src/Services/FormRequestResolver.php:22:            if (!$type || $type->isBuiltin()) {
+src/Services/FormRequestResolver.php:26:            $className = $type->getName();
+src/Services/PostmanJsonSerializer.php:18:            throw new RuntimeException("Failed to serialize Postman collection: " . $e->getMessage(), 0, $e);
+src/Services/AuthDetector.php:12:        $authMiddlewares = config('postman-generator.auth_middlewares', [
+src/PostmanGeneratorServiceProvider.php:20:        $this->mergeConfigFrom(__DIR__ . '/../config/postman-generator.php', 'postman-generator');
+src/PostmanGeneratorServiceProvider.php:22:        $this->app->singleton(RouteScannerContract::class, RouteScanner::class);
+src/PostmanGeneratorServiceProvider.php:23:        $this->app->singleton(MetadataExtractorContract::class, MetadataExtractor::class);
+src/PostmanGeneratorServiceProvider.php:24:        $this->app->singleton(BodyExampleGeneratorContract::class, BodyExampleGenerator::class);
+src/PostmanGeneratorServiceProvider.php:25:        $this->app->singleton(CollectionBuilderContract::class, CollectionBuilder::class);
+src/PostmanGeneratorServiceProvider.php:27:        $this->app->singleton(Services\AuthDetector::class);
+src/PostmanGeneratorServiceProvider.php:28:        $this->app->singleton(Services\FormRequestResolver::class);
+src/PostmanGeneratorServiceProvider.php:29:        $this->app->singleton(Services\PostmanJsonSerializer::class);
+src/PostmanGeneratorServiceProvider.php:30:        $this->app->singleton(Services\ResponseExampleGenerator::class);
+src/PostmanGeneratorServiceProvider.php:35:        if ($this->app->runningInConsole()) {
+src/PostmanGeneratorServiceProvider.php:36:            $this->publishes([
+src/PostmanGeneratorServiceProvider.php:37:                __DIR__ . '/../config/postman-generator.php' => config_path('postman-generator.php'),
+src/PostmanGeneratorServiceProvider.php:38:            ], 'postman-generator-config');
+src/PostmanGeneratorServiceProvider.php:40:            $this->commands([
+src/DataObjects/EnrichedRouteData.php:17:        $this->id = strtoupper($this->route->method) . ' ' . $this->route->uri;
+src/Commands/GenerateCommand.php:17:    protected $signature = 'postman:generate {--output= : Override the default output path}';
+src/Commands/GenerateCommand.php:33:        $this->info('Scanning routes...');
+src/Commands/GenerateCommand.php:34:        $routes = $this->scanner->scan();
+src/Commands/GenerateCommand.php:37:            $this->warn('No API routes found matching your configuration.');
+src/Commands/GenerateCommand.php:41:        $this->info('Enriching route metadata and capturing examples...');
+src/Commands/GenerateCommand.php:46:            $enriched = $this->extractor->extract($route);
+src/Commands/GenerateCommand.php:49:            $bodies[$route->uri] = $this->bodyGenerator->generate($enriched);
+src/Commands/GenerateCommand.php:52:        $this->info('Building collection...');
+src/Commands/GenerateCommand.php:53:        $collection = $this->builder->build($enrichedRoutes, $bodies);
+src/Commands/GenerateCommand.php:55:        $this->info('Finalizing items...');
+src/Commands/GenerateCommand.php:57:        $enrichedById = collect($enrichedRoutes)->keyBy('id');
+src/Commands/GenerateCommand.php:66:                $route = $enrichedById->get($routeId);
+src/Commands/GenerateCommand.php:69:                    $this->responseGenerator->attach($item, $route, $bodies[$route->route->uri] ?? BodySchema::empty());
+src/Commands/GenerateCommand.php:76:        $json = $this->serializer->serialize($collection);
+src/Commands/GenerateCommand.php:78:        $outputPath = $this->option('output') ?: config('postman-generator.output_path');
+src/Commands/GenerateCommand.php:87:        $this->info("Postman collection successfully generated at: $outputPath");
+src/Commands/GenerateCommand.php:89:        $this->printSummary($enrichedRoutes, $bodies);
+src/Commands/GenerateCommand.php:97:        $withBody = count(array_filter($bodies, fn($b) => !$b->isEmpty && $b->mode !== 'none'));
+src/Commands/GenerateCommand.php:99:        $this->table(
+src/Commands/GenerateCommand.php:104:                ['Endpoints without Body', $total - $withBody],
