@@ -1,6 +1,5 @@
 {
     "name": "laravelgenerators/postman-generator",
-    "version": "0.1.0",
     "description": "Automatically generates a Postman Collection JSON from a Laravel API project.",
     "type": "library",
     "license": "MIT",
