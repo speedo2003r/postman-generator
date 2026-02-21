@@ -44,6 +44,11 @@ class MetadataExtractor implements Contract
             return $defaults;
         }
 
+        // Double-check method exists (defensive against stale routes, disabled modules)
+        if (!method_exists($route->controllerClass, $route->actionMethod)) {
+            return $defaults;
+        }
+
         $reflection = new ReflectionMethod($route->controllerClass, $route->actionMethod);
 
         // 1. Check Attributes

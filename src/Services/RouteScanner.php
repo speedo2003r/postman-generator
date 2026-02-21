@@ -76,7 +76,9 @@ class RouteScanner implements Contract
     {
         $action = $route->getAction();
         if (isset($action['controller']) && is_string($action['controller'])) {
-            return explode('@', $action['controller'])[0];
+            $controllerClass = explode('@', $action['controller'])[0];
+            // Verify the controller class actually exists (handles disabled modules, stale cache, etc.)
+            return class_exists($controllerClass) ? $controllerClass : null;
         }
         return null;
     }
@@ -86,7 +88,16 @@ class RouteScanner implements Contract
         $action = $route->getAction();
         if (isset($action['controller']) && is_string($action['controller'])) {
             $parts = explode('@', $action['controller']);
-            return isset($parts[1]) ? $parts[1] : null;
+            if (!isset($parts[1])) {
+                return null;
+            }
+            $method = $parts[1];
+            $controllerClass = $parts[0];
+            // Verify the method exists in the controller
+            if (class_exists($controllerClass) && method_exists($controllerClass, $method)) {
+                return $method;
+            }
+            return null;
         }
         return null;
     }
