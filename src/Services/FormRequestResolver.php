@@ -3,8 +3,9 @@
 namespace LaravelGenerators\PostmanGenerator\Services;
 
 use Illuminate\Foundation\Http\FormRequest;
-use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
+use ReflectionUnionType;
 
 class FormRequestResolver
 {
@@ -19,14 +20,30 @@ class FormRequestResolver
         foreach ($reflection->getParameters() as $parameter) {
             $type = $parameter->getType();
 
-            if (!$type || $type->isBuiltin()) {
+            if (!$type) {
                 continue;
             }
 
-            $className = $type->getName();
+            // Handle union types (e.g., FooRequest|int|null)
+            if ($type instanceof ReflectionUnionType) {
+                foreach ($type->getTypes() as $unionType) {
+                    if ($unionType instanceof ReflectionNamedType && !$unionType->isBuiltin()) {
+                        $className = $unionType->getName();
+                        if (is_subclass_of($className, FormRequest::class)) {
+                            return $className;
+                        }
+                    }
+                }
+                continue;
+            }
 
-            if (is_subclass_of($className, FormRequest::class)) {
-                return $className;
+            // Handle named types
+            if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
+                $className = $type->getName();
+
+                if (is_subclass_of($className, FormRequest::class)) {
+                    return $className;
+                }
             }
         }
 
