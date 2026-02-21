@@ -14,7 +14,7 @@ A smart Postman collection generator for Laravel 11.x and 12.x that automaticall
 ## Installation
 
 ```bash
-composer require laravelgenerators/postman-generator --dev
+composer require laravelgenerators/postman-generator:main-dev
 ```
 
 The package uses Laravel's auto-discovery, so it's ready to use immediately.
