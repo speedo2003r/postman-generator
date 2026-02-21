@@ -1,6 +1,6 @@
 # Laravel Postman Collection Generator
 
-A smart Postman collection generator for Laravel 11.x that automatically scans routes, extracts metadata from attributes/docblocks, and generates realistic request body examples from FormRequests.
+A smart Postman collection generator for Laravel 11.x and 12.x that automatically scans routes, extracts metadata from attributes/docblocks, and generates realistic request body examples from FormRequests.
 
 ## Features
 
