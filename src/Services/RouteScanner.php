@@ -47,9 +47,15 @@ class RouteScanner implements Contract
         }
 
         $middlewares = $route->gatherMiddleware();
+        $uri = $route->uri();
         
-        // Check if it belongs to the target group
-        if (!in_array($targetGroup, $middlewares)) {
+        // Check if it belongs to the target group (api)
+        // Method 1: Check if route has 'api' middleware
+        // Method 2: Check if route URI starts with 'api/'
+        $hasApiMiddleware = in_array($targetGroup, $middlewares);
+        $hasApiPrefix = str_starts_with($uri, $targetGroup . '/');
+        
+        if (!$hasApiMiddleware && !$hasApiPrefix) {
             return false;
         }
 
@@ -62,7 +68,6 @@ class RouteScanner implements Contract
         }
 
         // Check path exclusion
-        $uri = $route->uri();
         foreach ($excludeRoutes as $pattern) {
             if (fnmatch($pattern, $uri)) {
                 return false;
